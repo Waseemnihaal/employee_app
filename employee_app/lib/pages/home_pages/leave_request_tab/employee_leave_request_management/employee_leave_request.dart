@@ -1,34 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:employee_app/sd.dart';
+import 'package:employee_app/models/user/user_save_data.dart';
+import 'package:employee_app/pages/home_pages/leave_request_tab/components/leave_status_filter_dropdown.dart';
+import 'package:employee_app/pages/home_pages/leave_request_tab/components/welcome_text.dart';
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:sizer/sizer.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:intl/intl.dart';
 
-class Eleave extends StatefulWidget {
-  const Eleave({super.key});
+class EmployeeLeaveRequestPage extends StatefulWidget {
+  const EmployeeLeaveRequestPage({super.key});
 
   @override
-  State<Eleave> createState() => _EleaveState();
+  State<EmployeeLeaveRequestPage> createState() =>
+      _EmployeeLeaveRequestPageState();
 }
 
-class _EleaveState extends State<Eleave> {
+class _EmployeeLeaveRequestPageState extends State<EmployeeLeaveRequestPage> {
   TextEditingController _reason = TextEditingController();
   var date = '',
       date1 = '',
       dd = 'All',
       ddl = ['All', 'Accepted', 'Rejected', 'Pending'];
   int ltype = 0;
-  saveData sd = saveData();
-  var lr;
+  List LeaveRequestList = [];
   bool isLoading = true;
 
   Future<bool> isDuplicateUniqueDate(String uniquedate) async {
     QuerySnapshot query = await FirebaseFirestore.instance
         .collection('leave')
         .where('Date', isEqualTo: uniquedate)
-        .where('email', isEqualTo: sd.getID())
+        .where('email', isEqualTo: UserSaveData().getID())
         .get();
     return query.docs.isNotEmpty;
   }
@@ -68,7 +69,7 @@ class _EleaveState extends State<Eleave> {
             date1 = '';
             ltype = 0;
             isLoading = true;
-            lr = null;
+            LeaveRequestList = [];
           });
           final snackBar = SnackBar(
             content: Text('Submitted sucessfully'),
@@ -93,7 +94,7 @@ class _EleaveState extends State<Eleave> {
     }
   }
 
-  Future lrs() async {
+  Future leaveRequestReadData() async {
     try {
       FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -101,17 +102,17 @@ class _EleaveState extends State<Eleave> {
       if (dd == 'All') {
         querySnapshot = await _firestore
             .collection('leave')
-            .where("email", isEqualTo: sd.getID())
+            .where("email", isEqualTo: UserSaveData().getID())
             .get();
       } else {
         querySnapshot = await _firestore
             .collection('leave')
-            .where("email", isEqualTo: sd.getID())
+            .where("email", isEqualTo: UserSaveData().getID())
             .where("status", isEqualTo: dd)
             .get();
       }
       setState(() {
-        lr = querySnapshot.docs.map((doc) => doc.data()).toList();
+        LeaveRequestList = querySnapshot.docs.map((doc) => doc.data()).toList();
         isLoading = false;
       });
 
@@ -161,8 +162,13 @@ class _EleaveState extends State<Eleave> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    leaveRequestReadData();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    lrs();
     return Scaffold(
       body: Stack(
         children: [
@@ -174,39 +180,23 @@ class _EleaveState extends State<Eleave> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    Text(
-                      'Welcome\n         ' +
-                          sd.getName().toString().toUpperCase(),
-                      style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: HexColor('#0143DB')),
-                    ),
-                    SizedBox(
-                      width: 100,
-                      child: DropdownButton(
-                        isExpanded: true,
-                        value: dd,
-                        onChanged: (value) {
+                    WelcomeText(),
+                    LeaveStatusDropdown(
+                        dropdownValue: dd,
+                        dropdownList: ddl,
+                        onChange: (value) {
                           setState(() {
                             dd = value!;
                           });
-                        },
-                        items: ddl.map((value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Center(child: Text(value)),
-                          );
-                        }).toList(),
-                      ),
-                    ),
+                          leaveRequestReadData();
+                        }),
                   ],
                 ),
                 isLoading
-                    ? Center(
+                    ? const Center(
                         child: CircularProgressIndicator(),
                       )
-                    : (lr != null && lr.length > 0)
+                    : LeaveRequestList.isNotEmpty
                         ? Column(
                             children: [
                               Container(
@@ -252,7 +242,7 @@ class _EleaveState extends State<Eleave> {
                                   ),
                                 ),
                               ),
-                              for (var i = 0; i < lr.length; i++)
+                              for (var i = 0; i < LeaveRequestList.length; i++)
                                 ExpansionTile(
                                   // height: 70,
                                   // margin:
@@ -269,24 +259,27 @@ class _EleaveState extends State<Eleave> {
 
                                       SizedBox(
                                           width: 20.w,
-                                          child: Text('${lr[i]['Date']}')),
+                                          child: Text(
+                                              '${LeaveRequestList[i]['Date']}')),
                                       SizedBox(
                                           width: 20.w,
-                                          child:
-                                              Text('${lr[i]['appliedDate']}')),
+                                          child: Text(
+                                              '${LeaveRequestList[i]['appliedDate']}')),
 
                                       SizedBox(
                                           width: 20.w,
                                           child: Text(
-                                            '${lr[i]['status']}',
+                                            '${LeaveRequestList[i]['status']}',
                                             style: TextStyle(
-                                                color:
-                                                    lr[i]['status'] == 'Pending'
-                                                        ? HexColor('#0143DB')
-                                                        : (lr[i]['status'] ==
-                                                                'Accepted'
-                                                            ? Colors.green
-                                                            : Colors.red)),
+                                                color: LeaveRequestList[i]
+                                                            ['status'] ==
+                                                        'Pending'
+                                                    ? Color(0xFF0143DB)
+                                                    : (LeaveRequestList[i]
+                                                                ['status'] ==
+                                                            'Accepted'
+                                                        ? Colors.green
+                                                        : Colors.red)),
                                           )),
                                     ],
                                   ),
@@ -304,7 +297,8 @@ class _EleaveState extends State<Eleave> {
                                               child: Text('Name:')),
                                           SizedBox(
                                               width: 60.w,
-                                              child: Text('${lr[i]['name']}'))
+                                              child: Text(
+                                                  '${LeaveRequestList[i]['name']}'))
                                         ],
                                       ),
                                     ),
@@ -321,8 +315,8 @@ class _EleaveState extends State<Eleave> {
                                               child: Text('Leave Type:')),
                                           SizedBox(
                                               width: 60.w,
-                                              child:
-                                                  Text('${lr[i]['LeaveType']}'))
+                                              child: Text(
+                                                  '${LeaveRequestList[i]['LeaveType']}'))
                                         ],
                                       ),
                                     ),
@@ -339,17 +333,21 @@ class _EleaveState extends State<Eleave> {
                                               child: Text('Reason:')),
                                           SizedBox(
                                               width: 60.w,
-                                              child: Text('${lr[i]['reason']}'))
+                                              child: Text(
+                                                  '${LeaveRequestList[i]['reason']}'))
                                         ],
                                       ),
                                     ),
-                                    if (lr[i]['status'] == 'Pending')
+                                    if (LeaveRequestList[i]['status'] ==
+                                        'Pending')
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: ElevatedButton(
                                           onPressed: () {
-                                            lrd(lr[i]['email'] + lr[i]['Date'],
-                                                lr[i]['Date']);
+                                            lrd(
+                                                LeaveRequestList[i]['email'] +
+                                                    LeaveRequestList[i]['Date'],
+                                                LeaveRequestList[i]['Date']);
                                           },
                                           child: Text('Cancel'),
                                           style: ElevatedButton.styleFrom(
@@ -366,7 +364,7 @@ class _EleaveState extends State<Eleave> {
                               child: Text(
                                 'No Leave request available',
                                 style: TextStyle(
-                                    color: HexColor('#0143DB'),
+                                    color: Color(0xFF0143DB),
                                     fontWeight: FontWeight.w600,
                                     fontSize: 25),
                               ),
@@ -381,7 +379,7 @@ class _EleaveState extends State<Eleave> {
             child: Align(
                 alignment: Alignment.bottomRight,
                 child: FloatingActionButton(
-                    backgroundColor: HexColor('#0143DB'),
+                    backgroundColor: Color(0xFF0143DB),
                     child: Icon(Icons.add),
                     onPressed: () {
                       showModalBottomSheet<void>(
@@ -467,7 +465,7 @@ class _EleaveState extends State<Eleave> {
                                               borderRadius:
                                                   BorderRadius.circular(10),
                                               borderSide: BorderSide(
-                                                  color: HexColor('#0143DB'),
+                                                  color: Color(0xFF0143DB),
                                                   width: 2)),
                                         ),
                                         validator: (value) {
@@ -537,14 +535,14 @@ class _EleaveState extends State<Eleave> {
                                                     ltype == 0 ||
                                                     date == '')
                                                 ? Colors.grey
-                                                : HexColor('#0143DB')),
+                                                : Color(0xFF0143DB)),
                                         onPressed: () {
                                           if (_reason.text != '' &&
                                               ltype != 0 &&
                                               date != '') {
                                             lea_req(
-                                                sd.getName(),
-                                                sd.getID(),
+                                                UserSaveData().getName(),
+                                                UserSaveData().getID(),
                                                 ltype == 1
                                                     ? 'Sick Leave'
                                                     : 'Casual Leave',
@@ -554,7 +552,7 @@ class _EleaveState extends State<Eleave> {
                                                     : datead(date) +
                                                         ' - ' +
                                                         datead(date1));
-                                            lrs();
+                                            leaveRequestReadData();
 
                                             Navigator.pop(context);
                                           }
@@ -574,7 +572,7 @@ class _EleaveState extends State<Eleave> {
       ),
       // bottomNavigationBar: Container(
       //   height: 60,
-      //   color: HexColor('#0143DB'),
+      //   color: Color(0xFF0143DB),
       //   child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
       //     Expanded(
       //       child: InkWell(

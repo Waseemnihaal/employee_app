@@ -1,4 +1,4 @@
-class saveData {
+class UserSaveData {
   static String id = '', type = '', name = '';
   setID(String id1, String type1, String name1) {
     id = id1;

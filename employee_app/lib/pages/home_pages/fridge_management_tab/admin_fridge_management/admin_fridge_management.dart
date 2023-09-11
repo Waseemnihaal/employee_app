@@ -1,18 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:employee_app/sd.dart';
+import 'package:employee_app/models/user/user_save_data.dart';
 import 'package:flutter/material.dart';
-import 'package:hexcolor/hexcolor.dart';
 import 'package:sizer/sizer.dart';
 
-class Afood extends StatefulWidget {
-  const Afood({super.key});
+class AdminFridgeManagementPage extends StatefulWidget {
+  const AdminFridgeManagementPage({super.key});
 
   @override
-  State<Afood> createState() => _AfoodState();
+  State<AdminFridgeManagementPage> createState() =>
+      _AdminFridgeManagementPageState();
 }
 
-class _AfoodState extends State<Afood> {
-  saveData sd = saveData();
+class _AdminFridgeManagementPageState extends State<AdminFridgeManagementPage> {
   var foodItems = [
         {"name": "Dairy Milk", "img": "assets/DairyMilk.png", "qty": 0},
         {"name": "Mountain Dew", "img": "assets/mountain_dew.png", "qty": 0},
@@ -126,11 +125,11 @@ class _AfoodState extends State<Afood> {
                     padding: const EdgeInsets.only(left: 20, bottom: 20),
                     child: Text(
                       'Welcome\n         ' +
-                          sd.getName().toString().toUpperCase(),
+                          UserSaveData().getName().toString().toUpperCase(),
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: HexColor('#0143DB')),
+                          color: Color(0xFF0143DB)),
                     ),
                   ),
                 ),
@@ -162,7 +161,7 @@ class _AfoodState extends State<Afood> {
                                         Text(
                                           '${fil[i]['name']}',
                                           style: TextStyle(
-                                              color: HexColor('#0143DB'),
+                                              color: Color(0xFF0143DB),
                                               fontWeight: FontWeight.w600),
                                         )
                                       ],
@@ -180,13 +179,12 @@ class _AfoodState extends State<Afood> {
                                                 Text(
                                                   'Available Qty',
                                                   // style: TextStyle(
-                                                  //     color: HexColor('#0143DB')),
+                                                  //     color: Color(0xFF0143DB)),
                                                 ),
                                                 Text(
                                                   '${fil[i]['qty']}',
                                                   style: TextStyle(
-                                                      color:
-                                                          HexColor('#0143DB')),
+                                                      color: Color(0xFF0143DB)),
                                                 ),
                                               ],
                                             ),
@@ -203,7 +201,7 @@ class _AfoodState extends State<Afood> {
                           child: Text(
                             'No Food available',
                             style: TextStyle(
-                                color: HexColor('#0143DB'),
+                                color: Color(0xFF0143DB),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 25),
                           ),
@@ -218,7 +216,7 @@ class _AfoodState extends State<Afood> {
             child: Align(
                 alignment: Alignment.bottomRight,
                 child: FloatingActionButton(
-                    backgroundColor: HexColor('#0143DB'),
+                    backgroundColor: Color(0xFF0143DB),
                     child: Icon(Icons.add),
                     onPressed: () {
                       showModalBottomSheet<void>(
@@ -280,8 +278,8 @@ class _AfoodState extends State<Afood> {
                                                     Text(
                                                       '${foodItems[i]['name']}',
                                                       style: TextStyle(
-                                                          color: HexColor(
-                                                              '#0143DB'),
+                                                          color:
+                                                              Color(0xFF0143DB),
                                                           fontWeight:
                                                               FontWeight.w600),
                                                     )
@@ -318,8 +316,8 @@ class _AfoodState extends State<Afood> {
                                                                 color: int.parse(foodItems[i]['qty']
                                                                             .toString()) >
                                                                         0
-                                                                    ? HexColor(
-                                                                        '#0143DB')
+                                                                    ? Color(
+                                                                        0xFF0143DB)
                                                                     : Colors
                                                                         .grey,
                                                               ),
@@ -345,8 +343,8 @@ class _AfoodState extends State<Afood> {
                                                           Text(
                                                             '${foodItems[i]['qty']}',
                                                             style: TextStyle(
-                                                                color: HexColor(
-                                                                    '#0143DB')),
+                                                                color: Color(
+                                                                    0xFF0143DB)),
                                                           ),
                                                           GestureDetector(
                                                             child: Container(
@@ -361,8 +359,8 @@ class _AfoodState extends State<Afood> {
                                                                   color: int.parse(foodItems[i]['qty']
                                                                               .toString()) <
                                                                           100
-                                                                      ? HexColor(
-                                                                          '#0143DB')
+                                                                      ? Color(
+                                                                          0xFF0143DB)
                                                                       : Colors
                                                                           .grey,
                                                                 ),
@@ -397,7 +395,7 @@ class _AfoodState extends State<Afood> {
                                       ElevatedButton(
                                         child: Text('Add'),
                                         style: ElevatedButton.styleFrom(
-                                            primary: HexColor('#0143DB')),
+                                            primary: Color(0xFF0143DB)),
                                         onPressed: () {
                                           for (var i = 0;
                                               i < foodItems.length;

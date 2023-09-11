@@ -1,19 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:employee_app/models/user/user_save_data.dart';
 import 'package:flutter/material.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:sizer/sizer.dart';
 
-import '../sd.dart';
-
-class Efood extends StatefulWidget {
-  const Efood({super.key});
+class EmployeeFridgeManagementPage extends StatefulWidget {
+  const EmployeeFridgeManagementPage({super.key});
 
   @override
-  State<Efood> createState() => _EfoodState();
+  State<EmployeeFridgeManagementPage> createState() =>
+      _EmployeeFridgeManagementPageState();
 }
 
-class _EfoodState extends State<Efood> {
-  saveData sd = saveData();
+class _EmployeeFridgeManagementPageState
+    extends State<EmployeeFridgeManagementPage> {
   var foodItems = [
         {"name": "Dairy Milk", "img": "assets/DairyMilk.png", "qty": 0},
         {"name": "Mountain Dew", "img": "assets/mountain_dew.png", "qty": 0},
@@ -56,7 +56,7 @@ class _EfoodState extends State<Efood> {
           .get();
       QuerySnapshot querySnapshot1 = await _firestore
           .collection('foodTaken')
-          .where("email", isEqualTo: sd.getID())
+          .where("email", isEqualTo: UserSaveData().getID())
           .get();
       setState(() {
         if (dd == 'Available') {
@@ -157,11 +157,11 @@ class _EfoodState extends State<Efood> {
                   children: [
                     Text(
                       'Welcome\n         ' +
-                          sd.getName().toString().toUpperCase(),
+                          UserSaveData().getName().toString().toUpperCase(),
                       style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,
-                          color: HexColor('#0143DB')),
+                          color: Color(0xFF0143DB)),
                     ),
                     SizedBox(
                       width: 100,
@@ -218,15 +218,14 @@ class _EfoodState extends State<Efood> {
                                                 Text(
                                                   '${fil[i]['name']}',
                                                   style: TextStyle(
-                                                      color:
-                                                          HexColor('#0143DB'),
+                                                      color: Color(0xFF0143DB),
                                                       fontWeight:
                                                           FontWeight.w600),
                                                 ),
                                                 Text(
                                                   '₹${fil[i]['price']}',
                                                   style: TextStyle(
-                                                    color: HexColor('#0143DB'),
+                                                    color: Color(0xFF0143DB),
                                                   ),
                                                 ),
                                               ],
@@ -246,7 +245,7 @@ class _EfoodState extends State<Efood> {
                                                     Text(
                                                       'Available Qty',
                                                       // style: TextStyle(
-                                                      //     color: HexColor('#0143DB')),
+                                                      //     color: Color(0xFF0143DB)),
                                                     ),
                                                     Text(
                                                       '${fil[i]['qty']}',
@@ -269,7 +268,7 @@ class _EfoodState extends State<Efood> {
                               child: Text(
                                 'No Food available',
                                 style: TextStyle(
-                                    color: HexColor('#0143DB'),
+                                    color: Color(0xFF0143DB),
                                     fontWeight: FontWeight.w600,
                                     fontSize: 25),
                               ),
@@ -307,7 +306,7 @@ class _EfoodState extends State<Efood> {
                                                     '${ft[i]['product']}',
                                                     style: TextStyle(
                                                         color:
-                                                            HexColor('#0143DB'),
+                                                            Color(0xFF0143DB),
                                                         fontWeight:
                                                             FontWeight.w600),
                                                   )
@@ -320,7 +319,7 @@ class _EfoodState extends State<Efood> {
                                                     'X ${ft[i]['qty']} = ${ft[i]['Amount']}',
                                                     style: TextStyle(
                                                         color:
-                                                            HexColor('#0143DB'),
+                                                            Color(0xFF0143DB),
                                                         fontWeight:
                                                             FontWeight.w600),
                                                   ))
@@ -336,7 +335,7 @@ class _EfoodState extends State<Efood> {
                                     child: Text(
                                       'No Food Taken History available',
                                       style: TextStyle(
-                                          color: HexColor('#0143DB'),
+                                          color: Color(0xFF0143DB),
                                           fontWeight: FontWeight.w600,
                                           fontSize: 25),
                                     ),
@@ -354,7 +353,7 @@ class _EfoodState extends State<Efood> {
                   child: Align(
                       alignment: Alignment.bottomRight,
                       child: FloatingActionButton(
-                          backgroundColor: HexColor('#0143DB'),
+                          backgroundColor: Color(0xFF0143DB),
                           child: Icon(Icons.remove),
                           onPressed: () {
                             showModalBottomSheet<void>(
@@ -501,7 +500,7 @@ class _EfoodState extends State<Efood> {
                                                                             BorderRadius.circular(5),
                                                                         color: int.parse(foodItems[i]['qty'].toString()) > -10 &&
                                                                                 -int.parse(foodItems[i]['qty'].toString()) < int.parse(fil[i]['qty'].toString())
-                                                                            ? HexColor('#0143DB')
+                                                                            ? Color(0xFF0143DB)
                                                                             : Colors.grey,
                                                                       ),
                                                                       child: Icon(
@@ -536,7 +535,7 @@ class _EfoodState extends State<Efood> {
                                             ElevatedButton(
                                               child: Text('Take'),
                                               style: ElevatedButton.styleFrom(
-                                                  primary: HexColor('#0143DB')),
+                                                  primary: Color(0xFF0143DB)),
                                               onPressed: () {
                                                 for (var i = 0;
                                                     i < foodItems.length;
@@ -549,7 +548,7 @@ class _EfoodState extends State<Efood> {
                                                         foodItems[i]['name'],
                                                         fil[i]['qty'],
                                                         foodItems[i]['qty'],
-                                                        sd.getID(),
+                                                        UserSaveData().getID(),
                                                         DateTime.now()
                                                             .toString(),
                                                         int.parse(foodItems[i]
@@ -581,7 +580,7 @@ class _EfoodState extends State<Efood> {
       bottomNavigationBar: dd == 'Taken'
           ? Container(
               height: 60,
-              color: HexColor('#0143DB'),
+              color: Color(0xFF0143DB),
               child: Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10),
                 child: Row(
@@ -601,7 +600,7 @@ class _EfoodState extends State<Efood> {
                         'Pay',
                         style: TextStyle(
                             fontSize: 20,
-                            color: HexColor('#0143DB'),
+                            color: Color(0xFF0143DB),
                             fontWeight: FontWeight.w600),
                       ),
                     )
